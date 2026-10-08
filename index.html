@@ -1,14 +1,93 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MiziziTok</title><script src="https://cdn.tailwindcss.com"></script><style>body{margin:0;background:#000;color:#fff;font-family:sans-serif;overflow:hidden}.snap{scroll-snap-type:y mandatory;height:100vh;overflow-y:scroll}.snap-item{scroll-snap-align:start;height:100vh;position:relative}video{width:100%;height:100%;object-fit:cover}</style></head><body>
-<div style="position:fixed;top:0;left:0;right:0;z-index:50;padding:12px;background:linear-gradient(#000,transparent);display:flex;justify-content:space-between"><b style="font-size:20px">Mizizi<span style="color:#ff3b30">Tok</span></b><span style="font-size:10px;background:#ffffff22;padding:4px 8px;border-radius:20px">7 TRIBES LIVE</span></div>
-<div style="position:fixed;top:50px;left:0;right:0;z-index:40;display:flex;gap:8px;overflow-x:auto;padding:8px 12px"><button onclick="filterTribe('All')" style="background:#ff3b30;color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:bold">All</button><button onclick="filterTribe('Kisii')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Kisii</button><button onclick="filterTribe('Luo')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Luo</button><button onclick="filterTribe('Luhya')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Luhya</button><button onclick="filterTribe('Kalenjin')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Kalenjin</button><button onclick="filterTribe('Kamba')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Kamba</button><button onclick="filterTribe('Kikuyu')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Kikuyu</button><button onclick="filterTribe('Maasai')" style="background:#222;padding:6px 14px;border-radius:20px;font-size:13px">Maasai</button></div>
-<div id="feed" class="snap"></div>
-<button onclick="document.getElementById('up').style.display='flex'" style="position:fixed;bottom:20px;right:20px;background:#ff3b30;width:56px;height:56px;border-radius:50%;font-size:30px;z-index:60">+</button>
-<div id="up" style="display:none;position:fixed;inset:0;background:#000000f0;z-index:70;flex-direction:column;padding:20px;justify-content:center"><h2 style="font-size:24px;font-weight:900">Post Your Culture</h2><input id="cap" placeholder="E.g. Obokano bwa Kisii 🔥" style="padding:14px;background:#1a1a1a;border-radius:10px;border:none;color:white;margin:12px 0"><select id="tr" style="padding:14px;background:#1a1a1a;border-radius:10px;border:none;color:white"><option>Kisii</option><option>Luo</option><option>Luhya</option><option>Kalenjin</option><option>Kamba</option><option>Kikuyu</option><option>Maasai</option></select><button onclick="postLocal()" style="background:#ff3b30;padding:14px;border-radius:10px;font-weight:bold;margin-top:12px">Post Now</button><button onclick="document.getElementById('up').style.display='none'" style="margin-top:10px;color:#666">Close</button></div>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>MIZIZITOK - 7 Tribes</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:system-ui,Arial;height:100vh;overflow:hidden}
+/* HEADER */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:#000;padding:8px 12px}
+.row1{display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:22px;letter-spacing:-1px}.logo span{color:#00ff88}
+.search{flex:1;margin:0 10px;background:#1a1a1a;border-radius:20px;padding:7px 12px;display:flex;align-items:center}
+.search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font-size:14px}
+.tabs{display:flex;justify-content:center;gap:24px;margin-top:8px;border-bottom:1px solid #222;padding-bottom:8px}
+.tab{font-weight:700;font-size:15px;color:#888;padding:4px 8px;border-bottom:2px solid transparent}
+.tab.active{color:#fff;border-bottom-color:#fff}
+.tribes{display:flex;gap:7px;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none}
+.tribes::-webkit-scrollbar{display:none}
+.tribe{padding:5px 12px;background:#222;border:1px solid #333;border-radius:16px;font-size:12px;font-weight:700;white-space:nowrap;color:#aaa}
+.tribe.active{background:#fff;color:#000}
+/* FEED */
+.feed{height:100vh;padding-top:110px;overflow-y:scroll;scroll-snap-type:y mandatory;padding-bottom:70px}
+.card{height:calc(100vh - 110px);scroll-snap-align:start;position:relative;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card video{width:100%;height:100%;object-fit:cover}
+/* OVERLAYS */
+.center-play{position:absolute;width:70px;height:70px;background:rgba(0,0,0,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;z-index:4}
+.volume{position:absolute;top:14px;right:14px;z-index:5;width:40px;height:40px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.side{position:absolute;right:8px;bottom:20px;z-index:5;display:flex;flex-direction:column;gap:20px;align-items:center}
+.side-btn{display:flex;flex-direction:column;align-items:center;gap:3px}
+.icon{width:46px;height:46px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;backdrop-filter:blur(6px)}
+.icon.liked{background:#ff2d55}
+.count{font-size:12px;font-weight:700}
+.info{position:absolute;bottom:0;left:0;right:60px;padding:0 12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.95));z-index:4}
+.user{font-weight:800;font-size:15px}.caption{font-size:13px;margin-top:4px;line-height:1.3}
+.song{font-size:12px;margin-top:8px;display:flex;align-items:center;gap:6px}
+.song span{animation:spin 3s linear infinite}
+/* BOTTOM NAV */
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:101;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:6px 0 10px}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:#888;font-size:10px;font-weight:600}
+.nav.active{color:#fff}.nav i{font-size:22px;font-style:normal}
+.plus{width:42px;height:28px;background:#fff;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center}
+.plus::before{content:'';position:absolute;left:-4px;top:0;width:100%;height:100%;background:#ff2d55;border-radius:8px;z-index:-1}
+.plus::after{content:'';position:absolute;right:-4px;top:0;width:100%;height:100%;background:#00f2ea;border-radius:8px;z-index:-1}
+.plus b{color:#000;font-size:20px}
+/* COMMENT SHEET */
+.sheet{position:fixed;bottom:-100%;left:0;right:0;height:65%;background:#121212;z-index:200;border-radius:20px 20px 0 0;transition:.3s;padding:14px;display:flex;flex-direction:column}
+.sheet.open{bottom:70px}
+.sheet-head{display:flex;justify-content:space-between;font-weight:800;padding-bottom:10px;border-bottom:1px solid #222}
+.comments{flex:1;overflow-y:auto;padding-top:10px}
+.cmt{margin-bottom:12px;display:flex;gap:8px}.cmt b{font-size:13px}.cmt p{font-size:12px;color:#ccc}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="row1">
+    <div class="logo">MIZIZI<span>TOK</span></div>
+    <div class="search">🔍 <input id="searchBox" placeholder="Search tribe, song, user..." oninput="searchNow()"></div>
+    <div style="font-size:20px">⚙️</div>
+  </div>
+  <div class="tabs">
+    <div class="tab" id="tabFollowing" onclick="switchTab('following')">Following</div>
+    <div class="tab active" id="tabForYou" onclick="switchTab('foryou')">For You</div>
+  </div>
+  <div class="tribes" id="tribeBar"></div>
+</div>
+
+<div class="feed" id="feed"></div>
+
+<div class="bottom">
+  <div class="nav active" onclick="switchTab('foryou')"><i>🏠</i>Home</div>
+  <div class="nav" onclick="openExplore()"><i>🔍</i>Explore</div>
+  <div class="nav" onclick="alert('Upload: Coming Soon! Record your tribe culture')"><div class="plus"><b>+</b></div></div>
+  <div class="nav" onclick="alert('Friends: 1.2K tribe friends online')"><i>👥</i>Friends</div>
+  <div class="nav" onclick="openInbox()"><i>📩</i>Inbox</div>
+</div>
+
+<div class="sheet" id="commentSheet">
+  <div class="sheet-head"><span id="cmtCount">126 comments</span><span onclick="closeComments()" style="padding:0 10px">✕</span></div>
+  <div class="comments" id="commentList"></div>
+  <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid #222"><input id="cmtInput" placeholder="Add comment..." style="flex:1;background:#222;border:0;border-radius:20px;padding:10px 14px;color:#fff"><button onclick="addComment()" style="background:#ff2d55;border:0;color:#fff;border-radius:20px;padding:0 18px;font-weight:800">Post</button></div>
+</div>
+
 <script>
-const demos=[{tribe:'Kisii',cap:'Obokano dance - Kisii tradition 🔥 #KisiiCulture',likes:234,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'},{tribe:'Luo',cap:'Ohangla moves! Dhol Luo to the world 🌍',likes:512,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'},{tribe:'Maasai',cap:'Adumu jumping dance - Maasai morans 💪',likes:892,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'},{tribe:'Kikuyu',cap:'Mugithi night - Kikuyu vibes',likes:321,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'},{tribe:'Luhya',cap:'Isukuti drums - Luhya celebration',likes:445,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'},{tribe:'Kalenjin',cap:'Kalenjin warriors song',likes:678,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'},{tribe:'Kamba',cap:'Kamba traditional dance - Kilumi',likes:198,url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'}];
-let all=[...demos];let currentFilter='All';
-function render(filter='All'){const feed=document.getElementById('feed');feed.innerHTML='';all.filter(v=>filter==='All'||v.tribe===filter).forEach(v=>{const d=document.createElement('div');d.className='snap-item';d.innerHTML=`<video src="${v.url}" loop muted playsinline autoplay onclick="this.paused?this.play():this.pause()"></video><div style="position:absolute;bottom:0;left:0;right:0;padding:20px 16px 30px;background:linear-gradient(transparent, black)"><span style="background:${v.tribe==='Kisii'?'#ff3b30':'#ffffff22'};padding:3px 10px;border-radius:12px;font-size:11px;font-weight:bold">${v.tribe}</span><p style="margin-top:8px;font-weight:700;font-size:15px">${v.cap}</p><p style="font-size:12px;opacity:0.7;margin-top:6px">❤️ ${v.likes} • 💬 ${Math.floor(v.likes/3)} • ↗️ Share</p></div>`;feed.appendChild(d);});}
-function filterTribe(t){currentFilter=t;render(t);}function postLocal(){const cap=document.getElementById('cap').value||'My culture video 🔥';const tr=document.getElementById('tr').value;all.unshift({tribe:tr,cap:cap,likes:0,url:demos[Math.floor(Math.random()*demos.length)].url});document.getElementById('up').style.display='none';render(currentFilter);alert('Posted!');}
-render();
-</script></body></html>
+const videos=[
+{tribe:'Kisii',user:'@KisiiCulture',caption:'Obokano dance! Kisii women are fire 🔥 #Kisii #Obokano',song:'Obokano Folk',src:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',likes:'12.5K',comments:['🔥🔥 Omogusii!','I love this culture','My tribe!']},
+{tribe:'Luo',user:'@LuoPride',caption:'Ohangla night in Kisumu - Dala ma! #Luo #Kisumu',song:'Ohangla Remix',src:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',likes:'25.1K',comments:['Jaluo to the world!','Enyewe!','Kisumu represent']},
+{tribe:'Luhya',user:'@MulembeVibes',caption:'Isukuti dance from Kakamega - Ingoma! ❤️ #Luhya #Isukuti',song:'Isukuti Beat',src:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',likes:'18.3K',comments:['Mulembe sana','Luhya pride!']},
+{tribe:'Kalenjin',user:'@KalenjinRun',caption:'Mursik secret for champions - Chemosit! 🏃‍♂️ #Kalenjin',song:'Kalenjin Folk',src:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',likes:'9.7K',comments:['Kipchoge!','Mursik power']},
+{tribe:'Kikuyu',user:'@KikuyuRoots',caption:'Mugithi night - Ruracio vibes! Wa
